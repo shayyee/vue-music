@@ -8,10 +8,13 @@ export function addClass(el, className) {
     if(hasClass(el, className)) {
         return
     }
-    let newClass = el.className.split(' ');
-    newClass.push(className);
-    el.className = newClass.join(' ');
-
+    if(el.className) {
+        let newClass = el.className.split(' ')
+        newClass.push(className)
+        el.className = newClass.join(' ')
+    }else{
+        el.className = className
+    }
 }
 
 export function hasClass(el, className) {
@@ -19,5 +22,5 @@ export function hasClass(el, className) {
      * 判断是否有某个class
      */
     let reg = new RegExp('(^|\\s)' + className + '(\\s|$)')
-    return reg.test(el.className);
+    return reg.test(el.className)
 }
