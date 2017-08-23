@@ -1,63 +1,94 @@
 <template>
     <div class="recommend">
-        <div class="recommend-content">
-            <div class="slider-wrapper" v-if="recommends.length">
-                <slider>
-                    <div v-for="item in recommends">
-                        <a :href="item.linkUrl">
-                            <img :src="item.picUrl">
-                        </a>
-                    </div>
-                </slider>
+        <scroll ref="scroll" class="recommend-content" :data="discList">
+            <div>
+                <div class="slider-wrapper" v-if="recommends.length">
+                    <slider>
+                        <div v-for="item in recommends">
+                            <a :href="item.linkUrl">
+                                <img class="needsclick" @load="loadImage" :src="item.picUrl">
+                            </a>
+                        </div>
+                    </slider>
+                </div>
+                <div class="recommend-list">
+                    <h1 class="list-title">热门歌单推荐</h1>
+                    <ul>
+                        <li class="item" v-for="item in discList">
+                            <div class="icon">
+                                <img v-lazy="item.imgurl" width="60" height="60">
+                            </div>
+                            <div class="text">
+                                <h2 class="name">{{item.creator.name}}</h2>
+                                <p class="desc">{{item.dissname}}</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
             </div>
-            <div class="recommend-list">
-                <h1 class="list-title">热门歌单推荐</h1>
-                <ul></ul>
+            <div class="loading-container" v-show="!discList.length">
+                <loading></loading>
             </div>
-        </div>
+        </scroll>
     </div>
 </template>
 
 <script type="text/ecmascript-6">
-    import Slider from 'base/slider/slider'
-    import { getRecommend, getDiscList } from 'api/recommend'
-    import { ERR_OK } from 'api/config'
-    export default {
-        data() {
-          return {
-              recommends: [],
-              discList: []
+  import Scroll from 'base/scroll/scroll'
+  import Slider from 'base/slider/slider'
+  import Loading from 'base/loading/loading'
+  import {getRecommend, getDiscList} from 'api/recommend'
+  import {ERR_OK} from 'api/config'
+
+  export default {
+    data() {
+      return {
+        recommends: [],
+        discList: [],
+      }
+    },
+    created() {
+      this._getRecommend()
+      setTimeout(() => {
+        this._getDiscList()
+      }, 1000)
+    },
+    components: {
+      Slider,
+      Scroll,
+      Loading
+    },
+    methods: {
+      _getRecommend() {
+        getRecommend().then((response) => {
+          if (response.code === ERR_OK) {
+            this.recommends = response.data.slider
           }
-        },
-        created() {
-            this._getRecommend()
-            this._getDiscList()
-        },
-        components: {
-            Slider
-        },
-        methods: {
-            _getRecommend() {
-                getRecommend().then((response) => {
-                    if(response.code === ERR_OK) {
-                        this.recommends = response.data.slider
-                    }
-                })
-            },
-            _getDiscList() {
-                getDiscList().then((response) => {
-                    if(response.code === ERR_OK) {
-                        this.discList = response.data.list
-                    }
-                })
-            }
+        })
+      },
+      _getDiscList() {
+        getDiscList().then((response) => {
+          if (response.code === ERR_OK) {
+            this.discList = response.data.list
+          }
+        })
+      },
+      loadImage() { //确保scroll组件拿到正确的高度，而不会因为_getRecommend的异步加载而出错
+        if (!this.checkloaded) {
+          //由于slider组件在img load后需要时间初始化，
+          // 未初始化完成的slider是垂直排列的，会是scroll的高度假性增高
+          setTimeout(() => {
+            this.$refs.scroll.refresh()
+          }, 20)
+          this.checkloaded = true
         }
+      }
     }
+  }
 </script>
 
 <style scoped lang="stylus" rel="stylesheet/stylus">
     @import "~common/stylus/variable"
-
     .recommend
         position: fixed
         width: 100%
