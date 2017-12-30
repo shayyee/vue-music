@@ -16,7 +16,7 @@
        */
       probeType: {
         type: Number,
-        dafault: 1
+        default: 1
       },
       /**
        * 当设置为 true，better-scroll 会阻止浏览器的原生 click 事件，并自己派发一个 click 事件。
@@ -54,6 +54,12 @@
       },
       refresh() {
         this.scroll && this.scroll.refresh()
+      },
+      scrollTo() {
+        this.scroll && this.scroll.scrollTo.apply(this.scroll, arguments)
+      },
+      scrollToElement() {
+        this.scroll && this.scroll.scrollToElement.apply(this.scroll, arguments)
       }
     },
     watch: {
