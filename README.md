@@ -1,6 +1,6 @@
 # vue-music
 
-> 根据教程做的音乐App
+> vue全家桶+抓取qq音乐数据 音乐App
 
 ## Build Setup
 
