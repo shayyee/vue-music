@@ -28,15 +28,22 @@
         </li>
       </ul>
     </div>
+    <div class="list-fixed" v-show="fixedTitle" ref="fixed">
+      <h1 class="fixed-title">{{fixedTitle}}</h1>
+    </div>
+    <div v-show="!data.length" class="loading-container">
+      <loading></loading>
+    </div>
   </scroll>
 </template>
 
 <script type="text/ecmascript-6">
   import Scroll from 'base/scroll/scroll'
   import { getData } from 'common/js/dom'
+  import Loading from 'base/loading/loading'
 
   const ANCHOR_HEIGHT = 18;
-
+  const TITLE_HEIGHT = 30;
   export default {
     name: 'listview',
     props: {
@@ -50,7 +57,8 @@
         scrollY: -1,
         currentIndex: 0,
         probeType: 3,
-        listenScroll: true
+        listenScroll: true,
+        diff: -1 //区块上限与scrollY之间的区块高度
       }
     },
     created() {
@@ -62,6 +70,10 @@
         return this.data.map((group) => {
           return group.title.substr(0,1)
         })
+      },
+      fixedTitle() {
+        if(this.scrollY > 0) return '';
+        return this.data[this.currentIndex] ? this.data[this.currentIndex].title : "";
       }
     },
     methods: {
@@ -83,7 +95,9 @@
         this.scrollY = pos.y
       },
       _scrollTo(index) {
-        if(index !== null) {
+        if(index || index == 0) {
+          // index边界处理
+          index = index<0 ? 0:(index > this.listHeight.length-2 ? this.listHeight.length-2 : index);
           this.scrollY = -this.listHeight[index];
           this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 0);
         }
@@ -121,15 +135,23 @@
           let height2 = listHeight[i + 1];
           if (-newY >= height1 && -newY < height2) {
             _this.currentIndex = i
+            _this.diff = height2 + newY;
             return;
           }
         }
         // 当滚动到底部，且-newY大于最后一个元素的上限
         this.currentIndex = listHeight.length - 2;
+      },
+      diff(newVal) {
+        let fixedTop = (newVal > 0 && newVal < TITLE_HEIGHT) ? newVal - TITLE_HEIGHT : 0;
+        if(this.fixedTop === fixedTop) {return;}
+        this.fixedTop = fixedTop;
+        this.$refs.fixed.style.transform = `translate3d(0,${fixedTop}px,0)`
       }
     },
     components: {
-      Scroll
+      Scroll,
+      Loading
     }
   }
 </script>
