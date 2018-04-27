@@ -3,6 +3,7 @@
  */
 import jsonp from 'common/js/jsonp'
 import {commonParams, options} from './config'
+import axios from 'axios'
 
 export function getSingerList() {
   const url = 'https://szc.y.qq.com/v8/fcg-bin/v8.fcg'
@@ -21,21 +22,29 @@ export function getSingerList() {
 
   return jsonp(url, data, options)
 }
-export function getVKey(songmid) {
-  const url = "https://c.y.qq.com/base/fcgi-bin/fcg_music_express_mobile3.fcg";
 
+export function getVKey(songmid) {
+  const url = '/api/getVKey';
   const data = Object.assign({}, commonParams, {
-    loginUin: 0,
+    g_tk:5381,
+    loginUin:0,
     hostUin:0,
+    format:'json',
     platform: 'yqq',
-    inCharset:'utf8',
-    outCharset:'utf-8',
+    needNewCode: 0,
+    cid:205361747,
+    uin:0,
     songmid: songmid,
     filename:`C400${songmid}.m4a`,
-    g_tk: 5381
-  });
-  return jsonp(url,data,options);
+    guid: '2155542447'
+  })
+  return axios.get(url, {
+    params: data
+  }).then((res) => {
+    return Promise.resolve(res.data)
+  })
 }
+
 export function getSingerDetail(singerId) {
   const url = "https://c.y.qq.com/v8/fcg-bin/fcg_v8_singer_track_cp.fcg";
 

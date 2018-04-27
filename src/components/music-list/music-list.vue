@@ -17,7 +17,7 @@
         <div class="bg-layer" ref="layer"></div>
         <scroll @scroll="scroll" :probeType="probeType" :listenScroll="listenScroll" :data="songs" class="list" ref="list">
             <div class="song-list-wrapper">
-                <song-list :songs="songs"></song-list>
+                <song-list @select="selectItem" :songs="songs"></song-list>
             </div>
             <div v-show="!songs.length" class="loading-container">
                 <loading></loading>
@@ -34,6 +34,7 @@
   import Loading from 'base/loading/loading'
   import SongList from 'base/song-list/song-list'
   import {prefixStyle} from 'common/js/dom'
+  import {mapActions} from 'vuex'
 
   // 预留的顶部高度(返回键)
   const RESERVED_HEIGHT = 40;
@@ -103,11 +104,20 @@
       }
     },
     methods: {
+      ...mapActions([
+        'selectPlay'
+      ]),
       scroll(pos) {
         this.scrollY = pos.y;
       },
       back() {
         this.$router.history.go(-1);
+      },
+      selectItem(item, index) {
+        this.selectPlay({
+          list: this.songs,
+          index
+        })
       },
       random() {
         console.log('random')

@@ -40,7 +40,6 @@
         getSingerDetail(this.singer.id).then(response => {
           if(response.code === ERR_OK) {
             _this.songs = _this._normalizeSons(response.data.list);
-            console.log(_this.songs);
           }
         });
       },

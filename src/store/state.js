@@ -7,10 +7,9 @@ const state = {
   playing: false,    // play or pause
   fullScreen: false, // 播放器展开和收起
   playList: [],      // 播放列表
-  sequenceList: [],  //支持各种播放模式
+  sequenceList: [],  //支持各种播放模式（真实播放的列表）
   mode: playMode.sequence, // 播放模式
   currentIndex: -1,        // 当前播放的歌曲索引
-
 }
 
 export default state;
