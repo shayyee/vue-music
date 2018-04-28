@@ -37,16 +37,16 @@
                         <span class="time time-r">{{formatTime(currentSong.duration)}}</span>
                     </div>
                     <div class="operators">
-                        <div class="icon i-left">
-                            <i class="icon-sequence"></i>
+                        <div class="icon i-left" @click="changeMode">
+                            <i :class="iconMode"></i>
                         </div>
-                        <div class="icon i-left" :class="{'disable': songReady}">
+                        <div class="icon i-left" :class="disableCls">
                             <i @click="prev" class="icon-prev"></i>
                         </div>
-                        <div class="icon i-center" :class="{'disable': songReady}">
+                        <div class="icon i-center" :class="disableCls">
                             <i @click="togglePlaying" :class="[playing ? 'icon-pause':'icon-play']"></i>
                         </div>
-                        <div class="icon i-right" :class="{'disable': songReady}">
+                        <div class="icon i-right" :class="disableCls">
                             <i @click="next" class="icon-next"></i>
                         </div>
                         <div class="icon i-right">
@@ -68,13 +68,14 @@
                 </div>
                 <!--播放/暂停-->
                 <div class="control">
-                    <i @click.stop="togglePlaying" :class="[playing ? 'icon-pause-mini':'icon-play-mini']"></i>
+                    <progress-cycle :radius="32" :percent="percent">
+                        <i @click.stop="togglePlaying" :class="[playing ? 'icon-pause-mini':'icon-play-mini','icon-mini']"></i>
+                    </progress-cycle>
                 </div>
                 <!--点击查看播放列表-->
                 <div class="control">
                     <i class="icon-playlist"></i>
                 </div>
-
             </div>
         </transition>
         <audio ref="audio" :src="audioUrl"
@@ -89,12 +90,16 @@
   import {prefixStyle} from 'common/js/dom'
   import {getVKey} from 'api/singer'
   import ProgressBar from 'base/progress-bar/progress-bar'
+  import ProgressCycle from 'base/progress-cycle/progress-cycle'
+  import {playMode} from 'common/js/config'
+  import {shuffle} from 'common/js/util'
 
   const transform = prefixStyle('transform');
 
   export default {
     components: {
-      ProgressBar
+      ProgressBar,
+      ProgressCycle
     },
     data() {
       return {
@@ -109,10 +114,19 @@
         'playList',
         'currentSong',
         'playing',
-        'currentIndex'
+        'currentIndex',
+        'mode',
+        'sequenceList'
       ]),
+      disableCls() {
+        return this.songReady ? '' : 'disable'
+      },
       percent() {
         return  this.currentTime / this.currentSong.duration;
+      },
+      iconMode() {
+        return this.mode === playMode.sequence ? 'icon-sequence'
+          : this.mode === playMode.loop ? 'icon-loop' : 'icon-random';
       }
     },
     watch: {
@@ -138,7 +152,9 @@
       ...mapMutations({
         setFullScreen: 'SET_FULL_SCREEN',
         setPlayingState: 'SET_PLAYING_STATE',
-        setCurrentIndex: 'SET_CURRENT_INDEX'
+        setCurrentIndex: 'SET_CURRENT_INDEX',
+        setPlayMode: 'SET_PLAY_MODE',
+        setPlayList: 'SET_PLAYLIST'
       }),
       back() {
         this.setFullScreen(false);
@@ -230,6 +246,25 @@
 //        if(!this.playing) {
 //          this.togglePlaying();
 //        }
+      },
+      changeMode() {
+        const mode = (this.mode + 1) % 3;
+        this.setPlayMode(mode);
+        let list = null;
+        if(mode === playMode.random) {
+          list = shuffle(this.sequenceList);
+        } else {
+          list = this.sequenceList;
+        }
+        // 保证在playlist改变时，当前正在播放的歌曲不变，即currentSong不变
+        this.resetCurrentIndex(list);
+        this.setPlayList(list);
+      },
+      resetCurrentIndex(list) {
+        let index = list.findIndex((item) => {
+          return item.id === this.currentSong.id;
+        });
+        this.setCurrentIndex(index);
       },
       // 用0补位，n为补零后的字符串长度
       _pad(num, n = 2) {
