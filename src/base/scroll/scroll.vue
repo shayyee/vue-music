@@ -53,6 +53,7 @@
         if (this.listenScroll) {
           let _this = this
           this.scroll.on('scroll', (pos) => {
+            console.log('emit scroll')
             _this.$emit('scroll', pos)
           })
         }

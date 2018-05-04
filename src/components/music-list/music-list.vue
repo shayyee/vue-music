@@ -105,7 +105,7 @@
     },
     methods: {
       ...mapActions([
-        'selectPlay'
+        'selectPlay','randomPlay'
       ]),
       scroll(pos) {
         this.scrollY = pos.y;
@@ -120,7 +120,9 @@
         })
       },
       random() {
-        console.log('random')
+        this.randomPlay({
+          list: this.songs
+        })
       }
     },
     components: {
