@@ -39,11 +39,11 @@
         }
         getSingerDetail(this.singer.id).then(response => {
           if(response.code === ERR_OK) {
-            _this.songs = _this._normalizeSons(response.data.list);
+            _this.songs = _this._normalizeSongs(response.data.list);
           }
         });
       },
-      _normalizeSons(list) {
+      _normalizeSongs(list) {
         let ret = [];
         list.forEach(i => {
           let {musicData} = i;
