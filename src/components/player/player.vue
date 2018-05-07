@@ -28,6 +28,9 @@
                                 <img :src="currentSong.image" alt="" class="image"/>
                             </div>
                         </div>
+                        <div class="playing-lyric-wrapper">
+                            <div class="playing-lyric">{{playingLyric}}</div>
+                        </div>
                     </div>
                     <scroll class="middle-r"
                             ref="lyricList"
@@ -105,6 +108,7 @@
 </template>
 
 <script type="text/ecmascript-6">
+  // 可能的bug： mini情况下暂停再播放，如果之前在全屏情况下是歌词部分则重新全屏无法跳转到当前行歌词
   import {mapGetters, mapMutations} from 'vuex'
   import animations from 'create-keyframe-animation'
   import {prefixStyle} from 'common/js/dom'
@@ -136,7 +140,8 @@
         currentTime: 0,
         currentLyric: null,
         currentLineNum: 0, // 当前歌词所在的行
-        currentShow: 'cd'
+        currentShow: 'cd',
+        playingLyric: ''
       }
     },
     computed: {
@@ -244,17 +249,6 @@
           this.currentLyric.togglePlay();
         }
       },
-      prev() {
-        if (!this.songReady) return;
-        let index = this.currentIndex - 1;
-        if (index === -1) {
-          index = this.playList.length - 1;
-        }
-        this.setCurrentIndex(index);
-        if (!this.playing) {
-          this.togglePlaying();
-        }
-      },
       end() {
         if (this.mode === playMode.loop) {
           this.loop();
@@ -269,16 +263,37 @@
           this.currentLyric.seek(0);
         }
       },
+      prev() {
+        if (!this.songReady) return;
+        if(this.playList.length === 1) {
+          this.loop();
+        } else {
+          let index = this.currentIndex - 1;
+          if (index === -1) {
+            index = this.playList.length - 1;
+          }
+          this.setCurrentIndex(index);
+          if (!this.playing) {
+            this.togglePlaying();
+          }
+        }
+        this.songReady = false;
+      },
       next() {
         if (!this.songReady) return;
-        let index = this.currentIndex + 1;
-        if (index === this.playList.length) {
-          index = 0;
+        if(this.playList.length === 1) {
+          this.loop();
+        } else {
+          let index = this.currentIndex + 1;
+          if (index === this.playList.length) {
+            index = 0;
+          }
+          this.setCurrentIndex(index);
+          if (!this.playing) {
+            this.togglePlaying();
+          }
         }
-        this.setCurrentIndex(index);
-        if (!this.playing) {
-          this.togglePlaying();
-        }
+        this.songReady = false;
       },
       ready() {
         this.songReady = true;
@@ -297,10 +312,14 @@
         return `${minute}:${second}`;
       },
       onProgressChange(percent) {
-        this.$refs.audio.currentTime = this.currentSong.duration * percent;
+        const currentTime = this.currentSong.duration * percent;
+        this.$refs.audio.currentTime = currentTime;
 //        if(!this.playing) {
 //          this.togglePlaying();
 //        }
+        if(this.currentLyric) {
+          this.currentLyric.seek(currentTime * 1000);
+        }
       },
       changeMode() {
         const mode = (this.mode + 1) % 3;
@@ -322,13 +341,17 @@
         this.setCurrentIndex(index);
       },
       getLyric() {
-        this.currentLineNum = 0;
+//        this.currentLineNum = 0;
         this.currentSong.getLyric().then(lyric => {
           this.currentLyric = new Lyric(lyric, this.handleLyric);
           if(this.playing) {
             this.currentLyric.play();
           }
           console.log(this.currentLyric);
+        }).catch(() => {
+          this.currentLyric = null;
+          this.playingLyric = '';
+          this.currentLineNum = 0;
         })
       },
       handleLyric({lineNum, txt}) {
@@ -339,6 +362,7 @@
         } else {
           this.$refs.lyricList.scrollTo(0, 0, 1000);
         }
+        this.playingLyric = txt;
       },
       middleTouchStart(e) {
         this.touch.initiated = true;
@@ -351,7 +375,7 @@
         const touch = e.touches[0];
         const deltaX = touch.pageX - this.touch.startX;
         const deltaY = touch.pageY - this.touch.startY;
-        console.log("delta: ", deltaX, deltaY);
+//        console.log("delta: ", deltaX, deltaY);
         // 纵向滚动
         if(Math.abs(deltaY) > Math.abs(deltaX)) return;
         const left = this.currentShow === 'cd' ? 0 : -window.innerWidth;
@@ -366,6 +390,7 @@
         this.touch.initiated = false;
         let offsetWidth;
         let opacity;
+        // 从右向左划
         if(this.currentShow === 'cd') {
           if(this.touch.percent > 0.2) {
             offsetWidth = -window.innerWidth;
