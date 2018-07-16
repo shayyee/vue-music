@@ -15,3 +15,4 @@ export const currentSong = (state) => {
 }
 // 歌单
 export const disc = state => state.disc;
+export const topList = state => state.topList;
