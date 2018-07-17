@@ -34,7 +34,7 @@
         return `${song.singer}·${song.album}`
       },
       getRankCls(index) {
-        if (index <= 2) {
+        if (index <= 2) {  // 前三名
           return `icon icon${index}`
         } else {
           return 'text'
