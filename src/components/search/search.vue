@@ -16,7 +16,7 @@
             </div>
         </div>
         <div class="search-result" v-show="query">
-            <suggest :query="query"></suggest>
+            <suggest @select="saveSearch" @listScroll="blurInput" :query="query"></suggest>
         </div>
         <router-view></router-view>
     </div>
@@ -27,6 +27,7 @@
   import Suggest from 'components/suggest/suggest'
   import {getHotKey} from 'api/search'
   import {ERR_OK} from 'api/config'
+  import {mapActions} from 'vuex'
 
   export default {
     components: {
@@ -43,6 +44,7 @@
       this._getHotKey()
     },
     methods: {
+      ...mapActions(['saveSearchHistory']),
       _getHotKey() {
         getHotKey().then(res => {
           if(res.code === ERR_OK) {
@@ -55,6 +57,12 @@
       },
       onQueryChange(query) {
         this.query = query
+      },
+      blurInput() {
+        this.$refs.searchBox.blur()
+      },
+      saveSearch() {
+        this.saveSearchHistory(this.query)
       }
     }
   }

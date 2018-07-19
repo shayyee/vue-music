@@ -189,6 +189,13 @@
         this.$nextTick(() => {
           val ? audio.play() : audio.pause();
         })
+      },
+      fullScreen(newVal) {
+        if (newVal) {
+          setTimeout(() => {
+            this.$refs.lyricList.refresh()
+          }, 20)
+        }
       }
     },
     methods: {
@@ -347,7 +354,6 @@
           if(this.playing) {
             this.currentLyric.play();
           }
-          console.log(this.currentLyric);
         }).catch(() => {
           this.currentLyric = null;
           this.playingLyric = '';
