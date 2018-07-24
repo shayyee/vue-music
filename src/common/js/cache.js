@@ -31,3 +31,7 @@ export function saveSearch(query) {
   storage.set(SERACH_KEY, searches)
   return searches
 }
+
+export function loadSearch() {
+  return storage.get(SERACH_KEY,[])
+}

@@ -2,6 +2,7 @@
  * Created by lenovo on 2018/3/19.
  */
 import {playMode} from "common/js/config"
+import {loadSearch} from "common/js/cache"
 const state = {
   singer: {},
   playing: false,    // play or pause
@@ -12,7 +13,7 @@ const state = {
   currentIndex: -1,        // 当前播放的歌曲索引
   disc: {},           // 歌单
   topList: {},         // 排行榜单详情
-  searchHistory: []
+  searchHistory: loadSearch()
 }
 
 export default state;
