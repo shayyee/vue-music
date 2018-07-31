@@ -15,9 +15,6 @@ export function getHotKey() {
 }
 
 export function search(query, page, zhida, perpage) {
-  /**
-   * 获取歌单数据
-   */
   const url = '/api/search'
   const data = Object.assign({}, {
     w: query,

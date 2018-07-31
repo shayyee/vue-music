@@ -17,7 +17,7 @@
                     <div class="search-history" v-show="searchHistory.length">
                         <h1 class="title">
                             <span class="text">搜索历史</span>
-                            <span class="clear" @click="deleteAll">
+                            <span class="clear" @click="showConfirm">
                             <i class="icon-clear"></i>
                         </span>
                         </h1>
@@ -29,6 +29,7 @@
         <div ref="searchResult" class="search-result" v-show="query">
             <suggest ref="suggest" @select="saveSearch" @listScroll="blurInput" :query="query"></suggest>
         </div>
+        <confirm ref="confirm" text="是否清空所有搜索历史" confirmBtnText="清空" @confirm="deleteAll"></confirm>
         <router-view></router-view>
     </div>
 </template>
@@ -36,6 +37,7 @@
 <script type="text/ecmascript-6">
   import SearchBox from 'base/search-box/search-box'
   import SearchList from 'base/search-list/search-list'
+  import Confirm from 'base/confirm/confirm'
   import Scroll from 'base/scroll/scroll'
   import Suggest from 'components/suggest/suggest'
   import {getHotKey} from 'api/search'
@@ -44,12 +46,13 @@
   import {playListMixin} from 'common/js/mixin'
 
   export default {
-    mixin: [playListMixin],
+    mixins: [playListMixin],
     components: {
       SearchBox,
       Suggest,
       SearchList,
-      Scroll
+      Scroll,
+      Confirm
     },
     data() {
       return {
@@ -64,6 +67,15 @@
       ...mapGetters(['searchHistory']),
       shortcut() {
         return this.hotKey.concat(this.searchHistory)
+      }
+    },
+    watch: {
+      query(newQuery) {
+        if(!newQuery) {
+          setTimeout(() => {
+            this.$refs.shortcut.refresh()
+          }, 20)
+        }
       }
     },
     methods: {
@@ -100,6 +112,9 @@
       },
       deleteAll() {
         this.clearSearchHistory()
+      },
+      showConfirm() {
+        this.$refs.confirm.show()
       }
     }
   }

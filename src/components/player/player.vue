@@ -29,7 +29,7 @@
                             </div>
                         </div>
                         <div class="playing-lyric-wrapper">
-                            <div class="playing-lyric">{{playingLyric}}</div>
+                            <div class="playing-lyric" v-html="playingLyric"></div>
                         </div>
                     </div>
                     <scroll class="middle-r"
@@ -40,7 +40,7 @@
                                 <p ref="lyricLine"
                                    class="text"
                                    :class="{'current': currentLineNum === index}"
-                                   v-for="(line,index) in currentLyric.lines">{{line.txt}}</p>
+                                   v-for="(line,index) in currentLyric.lines" v-html="line.txt"></p>
                             </div>
                         </div>
                     </scroll>
@@ -96,11 +96,12 @@
                     </progress-cycle>
                 </div>
                 <!--点击查看播放列表-->
-                <div class="control">
+                <div class="control" @click="showPlaylist">
                     <i class="icon-playlist"></i>
                 </div>
             </div>
         </transition>
+        <playlist ref="playlist"></playlist>
         <audio ref="audio" :src="audioUrl"
                @canplay="ready" @error="error"
                @timeupdate="updateTime" @ended="end"></audio>
@@ -119,6 +120,7 @@
   import {shuffle} from 'common/js/util'
   import Lyric from 'common/js/lyric-parser'
   import Scroll from 'base/scroll/scroll'
+  import Playlist from 'components/playlist/playlist'
 
   const transform = prefixStyle('transform');
   const transitionDuration = prefixStyle('transitionDuration');
@@ -127,7 +129,8 @@
     components: {
       ProgressBar,
       ProgressCycle,
-      Scroll
+      Scroll,
+      Playlist
     },
     created() {
       // created 中定义的变量不会添加getter/setter
@@ -422,6 +425,9 @@
         this.$refs.lyricList.$el.style[transitionDuration] = `${time}ms`;
         this.$refs.middleL.style.opacity = opacity;
         this.$refs.middleL.style[transitionDuration] = `${time}ms`;
+      },
+      showPlaylist() {
+        this.$refs.playlist.show()
       },
       // 用0补位，n为补零后的字符串长度
       _pad(num, n = 2) {
