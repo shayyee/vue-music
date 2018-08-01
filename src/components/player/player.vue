@@ -96,7 +96,7 @@
                     </progress-cycle>
                 </div>
                 <!--点击查看播放列表-->
-                <div class="control" @click="showPlaylist">
+                <div class="control" @click.stop="showPlaylist">
                     <i class="icon-playlist"></i>
                 </div>
             </div>
@@ -170,6 +170,7 @@
     },
     watch: {
       currentSong(newSong, oldSong) {
+        if(!newSong.id) return;
         if (newSong.id === oldSong.id) {
           return;
         }

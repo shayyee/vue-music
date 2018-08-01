@@ -9,24 +9,25 @@
                         <span class="clear"></span>
                     </h1>
                 </div>
-                <div class="list-content">
+                <scroll ref="listContent" :data="sequenceList" class="list-content">
                     <ul>
-                        <li class="item" v-for="item in sequenceList">
-                            <i class="current"></i>
+                        <li ref="listItem" class="item" v-for="(item,index) in sequenceList"
+                            @click="selectItem(item,index)">
+                            <i class="current" :class="getCurrentIcon(item)"></i>
                             <span class="text">{{item.name}}</span>
                             <span class="like">
                                 <i class="icon-not-favorite"></i>
                             </span>
-                            <span class="delete">
+                            <span class="delete" @click.stop="deleteOne(item)">
                                 <i class="icon-delete"></i>
                             </span>
                         </li>
                     </ul>
-                </div>
+                </scroll>
                 <div class="list-operate">
                     <div class="add">
                         <i class="icon-add"></i>
-                        <span class="text"></span>
+                        <span class="text">添加歌曲到队列</span>
                     </div>
                 </div>
                 <div class="list-close" @click="hide">
@@ -38,8 +39,13 @@
 </template>
 
 <script type="text/ecmascript-6">
-  import {mapGetters} from 'vuex'
+  import {mapGetters, mapMutations, mapActions} from 'vuex'
+  import {playMode} from 'common/js/config'
+  import Scroll from 'base/scroll/scroll'
   export default {
+    components:{
+      Scroll
+    },
     data() {
       return {
         showFlag: false
@@ -47,15 +53,64 @@
     },
     computed: {
       ...mapGetters([
-        'sequenceList'
+        'sequenceList',
+        'currentSong',
+        'playList'
       ])
     },
+    watch: {
+      currentSong(newSong, oldSong) {
+        if(!this.showFlag || newSong.id == oldSong.id) {
+          return
+        }
+        this.scrollToCurrent(newSong)
+      }
+    },
     methods: {
+      ...mapMutations({
+        setCurrentIndex: 'SET_CURRENT_INDEX',
+        setPlayingState: 'SET_PLAYING_STATE'
+      }),
+      ...mapActions([
+        'deleteSong'
+      ]),
       show() {
         this.showFlag = true
+        setTimeout(() => {
+          this.$refs.listContent.refresh()
+          this.scrollToCurrent(this.currentSong)
+        }, 20)
       },
       hide() {
         this.showFlag = false
+      },
+      getCurrentIcon(item) {
+        if(this.currentSong.id === item.id) {
+          return 'icon-play'
+        } else {
+          return ''
+        }
+      },
+      selectItem(item, index) {
+        if(this.mode === playMode.random) {
+          index = this.playList.findIndex((song) => {
+            return song.id == item.id
+          })
+        }
+        this.setCurrentIndex(index)
+        this.setPlayingState(true)
+      },
+      scrollToCurrent(current) {
+        const index = this.sequenceList.findIndex((song) => {
+          return current.id === song.id
+        })
+        this.$refs.listContent.scrollToElement(this.$refs.listItem[index], 300)
+      },
+      deleteOne(item) {
+        this.deleteSong(item)
+        if(!this.playList.length) {
+          this.hide()
+        }
       }
     }
   }
