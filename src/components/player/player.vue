@@ -110,7 +110,7 @@
 
 <script type="text/ecmascript-6">
   // 可能的bug： mini情况下暂停再播放，如果之前在全屏情况下是歌词部分则重新全屏无法跳转到当前行歌词
-  import {mapGetters, mapMutations} from 'vuex'
+  import {mapGetters, mapMutations, mapActions} from 'vuex'
   import animations from 'create-keyframe-animation'
   import {prefixStyle} from 'common/js/dom'
   import {getVKey} from 'api/singer'
@@ -200,6 +200,7 @@
         setFullScreen: 'SET_FULL_SCREEN',
         setPlayingState: 'SET_PLAYING_STATE'
       }),
+      ...mapActions(['savePlayHistory']),
       back() {
         this.setFullScreen(false);
       },
@@ -298,6 +299,7 @@
       },
       ready() {
         this.songReady = true;
+        this.savePlayHistory(this.currentSong)
       },
       // 歌曲加载失败
       error() {

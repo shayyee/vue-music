@@ -77,7 +77,10 @@ export const searchMixin = {
     ...mapGetters(['searchHistory']),
   },
   methods: {
-    ...mapActions(['saveSearchHistory','clearSearchHistory']),
+    ...mapActions([
+      'saveSearchHistory',
+      'deleteSearchHistory'
+    ]),
     blurInput() {
       this.$refs.searchBox.blur()
     },

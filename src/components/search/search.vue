@@ -78,7 +78,7 @@
       }
     },
     methods: {
-      ...mapActions(['deleteSearchHistory']),
+      ...mapActions(['clearSearchHistory']),
       _getHotKey() {
         getHotKey().then(res => {
           if(res.code === ERR_OK) {
