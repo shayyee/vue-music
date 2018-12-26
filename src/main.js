@@ -7,12 +7,15 @@ import store from './store'
 import fastclick from 'fastclick'
 import VueLazyLoad from 'vue-lazyload'
 
+import vConsole from 'vconsole'
+var vconsole = new vConsole();
+console.log('test')
+
 fastclick.attach(document.body)
 
 Vue.use(VueLazyLoad, {
   loading: require('common/image/default.png')
 })
-
 Vue.config.productionTip = false
 import 'common/stylus/index.styl'
 /* eslint-disable no-new */

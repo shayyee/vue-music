@@ -175,8 +175,10 @@
           if(_this.currentLyric) {
             _this.currentLyric.stop();
           }
+          // 如果app被切后台是否需要使用setTimeout，
+          // 使用setTimeout 1s会导致快速切换按暂停歌曲仍能播放的问题
           _this.$nextTick(() => {
-            _this.$refs.audio.volume = 0.1;
+            _this.$refs.audio.volume = 0.4;
             _this.$refs.audio.play();
             _this.getLyric();
           });
@@ -270,6 +272,10 @@
         if (!this.songReady) return;
         if(this.playList.length === 1) {
           this.loop();
+          if (!this.playing) {
+            this.togglePlaying();
+          }
+          return;
         } else {
           let index = this.currentIndex - 1;
           if (index === -1) {
@@ -286,6 +292,10 @@
         if (!this.songReady) return;
         if(this.playList.length === 1) {
           this.loop();
+          if (!this.playing) {
+            this.togglePlaying();
+          }
+          return;
         } else {
           let index = this.currentIndex + 1;
           if (index === this.playList.length) {

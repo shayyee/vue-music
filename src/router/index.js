@@ -1,15 +1,16 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Recommend from 'components/recommend/recommend'
-import Singer from 'components/singer/singer'
-import Rank from 'components/rank/rank'
-import Search from 'components/search/search'
-import SingerDetail from 'components/singer-detail/singer-detail'
-import Disc from 'components/disc/disc'
-import TopList from 'components/top-list/top-list'
-import UserCenter from 'components/user-center/user-center'
 
 Vue.use(Router)
+
+const Recommend = () => import('components/recommend/recommend.vue')
+const Singer = () => import('components/singer/singer.vue')
+const Rank = () => import('components/rank/rank.vue')
+const Search = () => import('components/search/search.vue')
+const SingerDetail = () => import('components/singer-detail/singer-detail.vue')
+const Disc = () => import('components/disc/disc.vue')
+const TopList = () => import('components/top-list/top-list.vue')
+const UserCenter = () => import('components/user-center/user-center.vue')
 
 export default new Router({
   // mode:'history',
