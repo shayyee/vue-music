@@ -5,7 +5,7 @@
 import * as types from './mutation-types'
 import {playMode} from "common/js/config"
 import {shuffle} from "common/js/util"
-import {saveSearch, deleteSearch, clearSearch, savePlay} from "common/js/cache"
+import {saveSearch, deleteSearch, clearSearch, savePlay, saveFavorite, deleteFavorite} from "common/js/cache"
 
 // 随机播放模式下，点击某一首歌需要找到他在当前已打乱的playList中的index
 function findIndex(list, song) {
@@ -120,4 +120,12 @@ export const deleteSongList = function ({commit}) {
 
 export const savePlayHistory = function ({commit}, song) {
   commit(types.SET_PLAY_HISTORY, savePlay(song))
+}
+
+export const saveFavoriteList = function ({commit}, song) {
+  commit(types.SET_FAVORITE_LIST, saveFavorite(song))
+}
+
+export const deleteFavoriteList = function ({commit}, song) {
+  commit(types.SET_FAVORITE_LIST, deleteFavorite(song))
 }

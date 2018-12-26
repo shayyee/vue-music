@@ -20,3 +20,6 @@ export const SET_SERACH_HISTORY = 'SET_SERACH_HISTORY'
 
 // 最近播放（播放历史）
 export const SET_PLAY_HISTORY = 'SET_PLAY_HISTORY'
+
+// 我喜欢的
+export const SET_FAVORITE_LIST = 'SET_FAVORITE_LIST'

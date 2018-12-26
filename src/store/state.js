@@ -2,7 +2,7 @@
  * Created by lenovo on 2018/3/19.
  */
 import {playMode} from "common/js/config"
-import {loadSearch, loadPlay} from "common/js/cache"
+import {loadSearch, loadPlay, loadFavorite} from "common/js/cache"
 const state = {
   singer: {},
   playing: false,    // play or pause
@@ -15,6 +15,7 @@ const state = {
   topList: {},         // 排行榜单详情
   searchHistory: loadSearch(),  // 搜索历史
   playHistory: loadPlay(),     // 最近播放
+  favoriteList: loadFavorite(),
 }
 
 export default state;
